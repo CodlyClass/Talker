@@ -83,6 +83,8 @@ void update_joined_channel(json &user) {
             }
             user["current_channel_id"] = t[0]["id"];
         }
+    }else{
+        user["current_channel_id"] = "0";
     }
 }
 void update_users_status() {
