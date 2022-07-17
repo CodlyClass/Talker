@@ -1,0 +1,41 @@
+{
+    "action":"send_message",
+    "params":{
+        "detail_type": "group",
+        "group_id": "413925523",
+        "message": "send from Talker"
+    }
+}
+
+{
+    "action":"send_message",
+    "params":{
+        "detail_type": "group",
+        "group_id": "413925523",
+        "message": [
+            {
+                "type":"image",
+                "data":{
+                    "file_id":"1fd752653ca782a515c4c39ffbe2886e0000080e"
+                }
+            },{
+                "type":"mention",
+                "data":{
+                    "user_id":"337698527"
+                }
+            }
+        ]
+    }
+}
+
+{
+    "action":"get_supported_actions",
+    "params":{}
+}
+
+{
+    "action":"get_group_member_list",
+    "params":{
+        "group_id": "413925523"
+    }
+}

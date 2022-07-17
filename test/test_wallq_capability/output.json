@@ -1,0 +1,16 @@
+----------- testing: "send_message"---------status: 200
+body:{"status":"ok","retcode":0,"data":{"message_id":"413925523 38291 725122974","time":1658052777.0},"message":"","echo":null}
+
+
+----------- testing: "send_message"---------status: 200
+body:{"status":"ok","retcode":0,"data":{"message_id":"413925523 38292 338562056","time":1658052778.0},"message":"","echo":null}
+
+
+----------- testing: "get_supported_actions"---------status: 200
+body:{"status":"ok","retcode":0,"data":["get_latest_events","get_supported_actions","get_status","get_version","send_message","delete_message","get_self_info","get_user_info","get_friend_list","get_group_info","get_group_list","get_group_member_list","get_group_member_info","set_group_name","kick_group_member","ban_group_member","unban_group_member","set_group_admin","unset_group_admin","upload_file","upload_file_fragmented","get_file","get_file_fragmented","set_new_friend","delete_friend","get_new_friend_request"],"message":"","echo":null}
+
+
+----------- testing: "get_group_member_list"---------status: 200
+body:{"status":"ok","retcode":0,"data":[{"user_id":"337698527","nickname":"🤔"},{"user_id":"625900384","nickname":"Juseph·Juestar"},{"user_id":"1309480594","nickname":"CcKksssPpPp"},{"user_id":"1359602084","nickname":"浩浩"},{"user_id":"1874808246","nickname":"Zzm"}],"message":"","echo":null}
+
+
