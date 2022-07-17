@@ -20,6 +20,7 @@ httplib::Headers headers = {
 json users_info;
 json conf;
 vector<string> ex_message;
+vector<string> comf_message;
 mt19937 mt(time(nullptr));
 const std::string currentDateTime() {
     time_t now = time(0);
@@ -32,6 +33,10 @@ const std::string currentDateTime() {
 
     return buf;
 }
+bool contain(const string &s, const string &aim) {
+    return s.find(aim) != string::npos;
+}
+bool equal(const string &s, const string &aim) { return s == aim; }
 
 void send_message_to_onebot(string text) {
     httplib::Client cli(conf["to_wallq"]["url"]);
@@ -53,7 +58,7 @@ void init_user_info() {
     auto res = cli.Get(getUrl.c_str(), headers);
     json temp = json::parse(res->body);
     for (auto c : temp["data"]["items"]) {
-        c["current_channel_id"] = 0;
+        c["current_channel_id"] = "0";
         users_info.push_back(c);
         cout << c["id"] << " " << c["username"] << endl;
     }
@@ -70,13 +75,13 @@ void update_joined_channel(json &user) {
         if (t[0]["id"] != user["current_channel_id"]) {
             cout << user["username"] << "进入了" << t[0]["name"] << "频道"
                  << endl;
-            user["current_channel_id"] = t[0]["id"];
-            if (conf.count("to_wallq")) {
+            if (conf.count("to_wallq") && user["current_channel_id"] != "0") {
                 send_message_to_onebot("（" + currentDateTime() + "） " +
                                        string(user["username"]) + "进入了" +
                                        string(t[0]["name"]) + "频道" +
                                        ex_message[mt() % ex_message.size()]);
             }
+            user["current_channel_id"] = t[0]["id"];
         }
     }
 }
@@ -86,6 +91,7 @@ void update_users_status() {
     }
 }
 int main() {
+    // load configations
     ifstream conf_in("conf.json");
     conf_in >> conf;
     conf_in.close();
@@ -96,11 +102,58 @@ int main() {
     if (!conf.count("to_wallq")) {
         cout << "Info: No configuration for to_wallq" << endl;
     } else {
+        if (!conf["to_wallq"].count("webhook_port"))
+            cout << "Info: No configuration for to_wallq.webhook_port" << endl;
         ex_message = conf["to_wallq"]["saohua"];
+        comf_message = conf["to_wallq"]["comf"];
     }
 
-    // cli.enable_server_certificate_verification(false);
+    // listen to wallq events, and handle
+    httplib::Server svr;
+    svr.Post("/", [&](auto _req, auto res) {
+        json req = json::parse(_req.body);
+        cout << "[receive log]: " << req << endl;
+        if (req["detail_type"] == "group" &&
+            req["group_id"] == conf["to_wallq"]["group_id"] &&
+            req.count("alt_message")) {
+            string txt = req["alt_message"];
 
+            if (contain(txt, "114514") || contain(txt, "特有的") ||
+                contain(txt, "好臭啊")) {
+                send_message_to_onebot("怎么哪里都有homo啊（恼");
+            }
+
+            if (contain(txt, "草") || contain(txt, "妈的") ||
+                contain(txt, "傻")) {
+                send_message_to_onebot("你怎么能骂人呢！");
+            }
+
+            if (contain(txt, "麻") || contain(txt, "躺") ||
+                contain(txt, "烦")) {
+                send_message_to_onebot(
+                    comf_message[mt() % comf_message.size()]);
+            }
+
+            if (contain(txt, "有无") || equal(txt, "kook") ||
+                contain(txt, "几点") || contain(txt, "频道")) {
+                string resp = "";
+                int ind = 0;
+                for (auto c : users_info) {
+                    if (!c.count("current_channel_id")) continue;
+                    if (c["current_channel_id"] == "0") continue;
+                    resp += (ind ? "、" : "") + string(c["username"]);
+                    ind++;
+                }
+                resp +=
+                    (ind ? " 已经在频道里了……" : "频道里没人，今天没人玩理");
+                cout << "kook";
+                send_message_to_onebot(resp);
+            }
+        }
+    });
+    thread t([&] { svr.listen("0.0.0.0", conf["to_wallq"]["webhook_port"]); });
+
+    // lopp to check KooK users' status
     init_user_info();
     while (1) {
         cout << endl;
@@ -109,3 +162,4 @@ int main() {
         cout << "-";
     }
 }
+// xJ_2013320115

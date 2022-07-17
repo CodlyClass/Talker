@@ -1,5 +1,5 @@
 .phony: run
 
 run:
-	g++ -o main main.cpp -std=c++11 -lssl -lcrypto
+	g++ -o main main.cpp -std=c++20 -lssl -lcrypto
 	./main
