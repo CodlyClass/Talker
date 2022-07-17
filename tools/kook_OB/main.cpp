@@ -75,7 +75,7 @@ void update_joined_channel(json &user) {
         if (t[0]["id"] != user["current_channel_id"]) {
             cout << user["username"] << "进入了" << t[0]["name"] << "频道"
                  << endl;
-            if (conf.count("to_wallq") && user["current_channel_id"] != "0") {
+            if (conf.count("to_wallq")) {
                 send_message_to_onebot("（" + currentDateTime() + "） " +
                                        string(user["username"]) + "进入了" +
                                        string(t[0]["name"]) + "频道" +
