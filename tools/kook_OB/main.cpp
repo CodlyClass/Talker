@@ -147,7 +147,7 @@ int main() {
                     ind++;
                 }
                 resp +=
-                    (ind ? " 已经在频道里了……" : "频道里没人，今天没人玩理");
+                    (ind ? " 已经在频道里了……" : "频道里没人，今天没人玩理～");
                 cout << "kook";
                 send_message_to_onebot(resp);
             }
