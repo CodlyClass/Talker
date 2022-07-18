@@ -39,6 +39,12 @@ bool contain(const string &s, const string &aim) {
 }
 bool equal(const string &s, const string &aim) { return s == aim; }
 
+string get_dirty_talk() {
+    httplib::Client cli("https://api.oddfar.com");
+
+    auto res = cli.Get("/yl/q.php?c=1009&encode=text");
+    return res->body;
+}
 void send_message_to_onebot(string text) {
     httplib::Client cli(conf["to_wallq"]["url"]);
     httplib::Headers h = {
@@ -53,6 +59,7 @@ void send_message_to_onebot(string text) {
     auto res = cli.Post("/", h, message.dump(), "application/json");
     cout << "[" << currentDateTime() << " send log]:" << res->body << endl;
 }
+
 void send_picture_to_onebot(string url) {
     httplib::Client cli(conf["to_wallq"]["url"]);
     httplib::Headers h = {
@@ -160,7 +167,7 @@ int main() {
             }
 
             if (contain(txt, "草") || contain(txt, "妈的") ||
-                contain(txt, "傻")) {
+                contain(txt, "傻") || contain(txt, "智障")) {
                 send_message_to_onebot("你怎么能骂人呢！");
             }
 
@@ -168,6 +175,14 @@ int main() {
                 contain(txt, "烦")) {
                 send_message_to_onebot(
                     comf_message[mt() % comf_message.size()]);
+            }
+
+            if (contain(txt, "骂")) {
+                int ind = txt.find("骂");
+                if (ind + 2 < txt.size()) {
+                    string name = txt.substr(ind + 2);
+                    send_message_to_onebot(name + "~ " + get_dirty_talk());
+                }
             }
 
             if (contain(txt, "有无") || equal(txt, "kook") ||
@@ -186,7 +201,6 @@ int main() {
                 send_message_to_onebot(resp);
             }
 
-
             // if (contain(txt, "色图") || contain(txt, "涩图") ||
             //     contain(txt, "rir")) {
             //     static size_t cur = curtime;
@@ -204,6 +218,7 @@ int main() {
 
     // lopp to check KooK users' status
     init_user_info();
+
     while (1) {
         cout << endl;
         update_users_status();
