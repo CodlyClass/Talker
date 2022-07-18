@@ -38,7 +38,6 @@ bool contain(const string &s, const string &aim) {
     return s.find(aim) != string::npos;
 }
 bool equal(const string &s, const string &aim) { return s == aim; }
-
 string get_dirty_talk() {
     httplib::Client cli("https://api.oddfar.com");
 
@@ -135,8 +134,12 @@ void update_joined_channel(json &user) {
     }
 }
 void update_users_status() {
-    for (auto &c : users_info) {
-        update_joined_channel(c);
+    try {
+        for (auto &c : users_info) {
+            update_joined_channel(c);
+        }
+    } catch (exception e) {
+        cout << "[panic]: " << e.what() << endl;
     }
 }
 int main() {
@@ -162,69 +165,61 @@ int main() {
     svr.Post("/", [&](auto _req, auto res) {
         try {
             json req = json::parse(_req.body);
-        } catch (Exception e) {
-        }
-        // cout << "[receive log]: " << req << endl;
-        if (req["detail_type"] == "group" &&
-            req["group_id"] == conf["to_wallq"]["group_id"] &&
-            req.count("alt_message")) {
-            string txt = req["alt_message"];
 
-            if (contain(txt, "114514") || contain(txt, "特有的") ||
-                contain(txt, "好臭啊")) {
-                send_message_to_onebot("怎么哪里都有homo啊（恼");
-            }
+            // cout << "[receive log]: " << req << endl;
+            if (req["detail_type"] == "group" &&
+                req["group_id"] == conf["to_wallq"]["group_id"] &&
+                req.count("alt_message")) {
+                string txt = req["alt_message"];
 
-            if (contain(txt, "草") || contain(txt, "妈的") ||
-                contain(txt, "傻") || contain(txt, "智障")) {
-                send_message_to_onebot("你怎么能骂人呢！");
-            }
+                if (contain(txt, "麻") || contain(txt, "躺") ||
+                    contain(txt, "烦")) {
+                    send_message_to_onebot(
+                        comf_message[mt() % comf_message.size()]);
+                }
 
-            if (contain(txt, "麻") || contain(txt, "躺") ||
-                contain(txt, "烦")) {
-                send_message_to_onebot(
-                    comf_message[mt() % comf_message.size()]);
-            }
+                if (contain(txt, "骂 ")) {
+                    int ind = txt.find("骂 ");
+                    cout << "[fuck]";
+                    if (ind + 4 < txt.size()) {
+                        string name = txt.substr(ind + 4);
+                        string words = get_dirty_talk();
+                        if (contain(name, "我")) name = "你";
+                        cout << name << "~ " << words << endl;
+                        send_message_to_onebot(name + "~ " + words);
+                    }
+                }
 
-            if (contain(txt, "骂")) {
-                int ind = txt.find("骂");
-                cout << "[fuck]";
-                if (ind + 3 < txt.size()) {
-                    string name = txt.substr(ind + 3);
-                    string words = get_dirty_talk();
-                    if (contain(name, "我")) name = "你";
-                    cout << name << "~ " << words << endl;
-                    send_message_to_onebot(name + "~ " + words);
+                if (equal(txt, "kook") || contain(txt, "频道")) {
+                    string resp = "";
+                    int ind = 0;
+                    for (auto c : users_info) {
+                        if (!c.count("current_channel_id")) continue;
+                        if (c["current_channel_id"] == "0") continue;
+                        resp += (ind ? "、" : "") + string(c["username"]);
+                        ind++;
+                    }
+                    resp += (ind ? " 已经在频道里了……"
+                                 : "频道里没人，今天没人玩理～");
+                    cout << "kook";
+                    send_message_to_onebot(resp);
                 }
             }
-
-            if (equal(txt, "kook") || contain(txt, "频道")) {
-                string resp = "";
-                int ind = 0;
-                for (auto c : users_info) {
-                    if (!c.count("current_channel_id")) continue;
-                    if (c["current_channel_id"] == "0") continue;
-                    resp += (ind ? "、" : "") + string(c["username"]);
-                    ind++;
-                }
-                resp +=
-                    (ind ? " 已经在频道里了……" : "频道里没人，今天没人玩理～");
-                cout << "kook";
-                send_message_to_onebot(resp);
-            }
-
-            // if (contain(txt, "色图") || contain(txt, "涩图") ||
-            //     contain(txt, "rir")) {
-            //     static size_t cur = curtime;
-            //     if (curtime - cur >= 20) {
-            //         cur = curtime;
-
-            //         send_setu();
-            //     }else{
-            //         send_message_to_onebot("太频繁了，休息一下吧～");
-            //     }
-            // }
+        } catch (exception e) {
+            cout << "[panic]: " << e.what() << endl;
         }
+
+        // if (contain(txt, "色图") || contain(txt, "涩图") ||
+        //     contain(txt, "rir")) {
+        //     static size_t cur = curtime;
+        //     if (curtime - cur >= 20) {
+        //         cur = curtime;
+
+        //         send_setu();
+        //     }else{
+        //         send_message_to_onebot("太频繁了，休息一下吧～");
+        //     }
+        // }
     });
     thread t([&] { svr.listen("0.0.0.0", conf["to_wallq"]["webhook_port"]); });
 
