@@ -195,8 +195,7 @@ int main() {
                 }
             }
 
-            if (contain(txt, "有无") || equal(txt, "kook") ||
-                contain(txt, "几点") || contain(txt, "频道")) {
+            if (equal(txt, "kook") || contain(txt, "频道")) {
                 string resp = "";
                 int ind = 0;
                 for (auto c : users_info) {
