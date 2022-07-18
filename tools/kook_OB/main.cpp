@@ -186,6 +186,7 @@ int main() {
                 send_message_to_onebot(resp);
             }
 
+
             // if (contain(txt, "色图") || contain(txt, "涩图") ||
             //     contain(txt, "rir")) {
             //     static size_t cur = curtime;
