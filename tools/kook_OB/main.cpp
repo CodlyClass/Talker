@@ -186,17 +186,17 @@ int main() {
                 send_message_to_onebot(resp);
             }
 
-            if (contain(txt, "色图") || contain(txt, "涩图") ||
-                contain(txt, "rir")) {
-                static int cur = curtime;
-                if (curtime - cur >= 20) {
-                    cur = curtime;
+            // if (contain(txt, "色图") || contain(txt, "涩图") ||
+            //     contain(txt, "rir")) {
+            //     static size_t cur = curtime;
+            //     if (curtime - cur >= 20) {
+            //         cur = curtime;
 
-                    send_setu();
-                }else{
-                    send_message_to_onebot("太频繁了，休息一下吧～");
-                }
-            }
+            //         send_setu();
+            //     }else{
+            //         send_message_to_onebot("太频繁了，休息一下吧～");
+            //     }
+            // }
         }
     });
     thread t([&] { svr.listen("0.0.0.0", conf["to_wallq"]["webhook_port"]); });
