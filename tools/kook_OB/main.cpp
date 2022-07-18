@@ -100,6 +100,7 @@ void init_user_info() {
     json temp = json::parse(res->body);
     for (auto c : temp["data"]["items"]) {
         c["current_channel_id"] = "0";
+        c["loss_pack_tick"] = 5;
         users_info.push_back(c);
         cout << c["id"] << " " << c["username"] << endl;
     }
@@ -114,7 +115,7 @@ void update_joined_channel(json &user) {
     json t = temp["data"]["items"];
     if (t.size() > 0) {
         if (t[0]["id"] != user["current_channel_id"]) {
-            cout << user["username"] << "进入了" << t[0]["name"] << "频道"
+            cout << user["username"] << "joined " << t[0]["name"] << "channel"
                  << endl;
             if (conf.count("to_wallq")) {
                 send_message_to_onebot("（" + currentDateTime() + "） " +
@@ -122,10 +123,15 @@ void update_joined_channel(json &user) {
                                        string(t[0]["name"]) + "频道" +
                                        ex_message[mt() % ex_message.size()]);
             }
+            cout << user["current_channel_id"] << endl;
             user["current_channel_id"] = t[0]["id"];
+            user["loss_pack_tick"] = 5;
         }
     } else {
-        // user["current_channel_id"] = "0";
+        if (user["loss_pack_tick"] == 0) return;
+        int t = user["loss_pack_tick"];
+        user["loss_pack_tick"] = t - 1;
+        if (user["loss_pack_tick"] == 0) user["current_channel_id"] = "0";
     }
 }
 void update_users_status() {
@@ -155,7 +161,7 @@ int main() {
     httplib::Server svr;
     svr.Post("/", [&](auto _req, auto res) {
         json req = json::parse(_req.body);
-        cout << "[receive log]: " << req << endl;
+        // cout << "[receive log]: " << req << endl;
         if (req["detail_type"] == "group" &&
             req["group_id"] == conf["to_wallq"]["group_id"] &&
             req.count("alt_message")) {
@@ -232,4 +238,4 @@ int main() {
     }
 }
 // xJ_2013320115
-// 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
+// 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
