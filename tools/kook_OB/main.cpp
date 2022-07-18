@@ -160,7 +160,10 @@ int main() {
     // listen to wallq events, and handle
     httplib::Server svr;
     svr.Post("/", [&](auto _req, auto res) {
-        json req = json::parse(_req.body);
+        try {
+            json req = json::parse(_req.body);
+        } catch (Exception e) {
+        }
         // cout << "[receive log]: " << req << endl;
         if (req["detail_type"] == "group" &&
             req["group_id"] == conf["to_wallq"]["group_id"] &&
@@ -237,4 +240,4 @@ int main() {
     }
 }
 // xJ_2013320115
-// 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
+// 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
