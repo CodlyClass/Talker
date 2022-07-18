@@ -75,5 +75,6 @@
         "shared_mutex": "cpp",
         "variant": "cpp",
         "compare": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

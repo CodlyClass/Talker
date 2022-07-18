@@ -21,6 +21,7 @@ json users_info;
 json conf;
 vector<string> ex_message;
 vector<string> comf_message;
+size_t curtime = 0;
 mt19937 mt(time(nullptr));
 const std::string currentDateTime() {
     time_t now = time(0);
@@ -51,6 +52,39 @@ void send_message_to_onebot(string text) {
 
     auto res = cli.Post("/", h, message.dump(), "application/json");
     cout << "[" << currentDateTime() << " send log]:" << res->body << endl;
+}
+void send_picture_to_onebot(string url) {
+    httplib::Client cli(conf["to_wallq"]["url"]);
+    httplib::Headers h = {
+        {"Authorization",
+         "Bearer " + string(conf["to_wallq"]["access_token"])}};
+
+    json message;
+    json pic = vector<json>(1);
+    json t;
+    t["url"] = url;
+    t["file_id"] = "";
+    pic[0]["type"] = "image";
+    pic[0]["data"] = t;
+    cout << pic << endl;
+    message["action"] = "send_message";
+    message["params"] = {{"detail_type", "group"},
+                         {"group_id", conf["to_wallq"]["group_id"]},
+                         {"message", pic}};
+
+    cout << message << endl;
+    auto res = cli.Post("/", h, message.dump(), "application/json");
+    cout << "[" << currentDateTime() << " send picture log]:" << res->body
+         << endl;
+}
+void send_setu() {
+    httplib::Client cli("https://api.lolicon.app");
+
+    auto res = cli.Get("/setu/v2");
+    json t = json::parse(res->body);
+    cout << t << endl;
+    cout << " [send setu]:" << string(t["data"][0]["urls"]["original"]) << endl;
+    send_picture_to_onebot(string(t["data"][0]["urls"]["original"]));
 }
 void init_user_info() {
     string getUrl =
@@ -83,8 +117,8 @@ void update_joined_channel(json &user) {
             }
             user["current_channel_id"] = t[0]["id"];
         }
-    }else{
-        //user["current_channel_id"] = "0";
+    } else {
+        // user["current_channel_id"] = "0";
     }
 }
 void update_users_status() {
@@ -151,6 +185,18 @@ int main() {
                 cout << "kook";
                 send_message_to_onebot(resp);
             }
+
+            if (contain(txt, "色图") || contain(txt, "涩图") ||
+                contain(txt, "rir")) {
+                static int cur = curtime;
+                if (curtime - cur >= 20) {
+                    cur = curtime;
+
+                    send_setu();
+                }else{
+                    send_message_to_onebot("太频繁了，休息一下吧～");
+                }
+            }
         }
     });
     thread t([&] { svr.listen("0.0.0.0", conf["to_wallq"]["webhook_port"]); });
@@ -161,6 +207,7 @@ int main() {
         cout << endl;
         update_users_status();
         sleep(1);
+        curtime++;
         cout << "-";
     }
 }
