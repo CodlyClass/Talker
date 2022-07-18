@@ -124,12 +124,13 @@ void update_joined_channel(json &user) {
             }
             cout << user["current_channel_id"] << endl;
             user["current_channel_id"] = t[0]["id"];
-            user["loss_pack_tick"] = 5;
         }
+        user["loss_pack_tick"] = 4;
     } else {
         if (user["loss_pack_tick"] == 0) return;
         int t = user["loss_pack_tick"];
         user["loss_pack_tick"] = t - 1;
+        cout << user["username"] << ": loss_pack_tick" << t - 1 << endl;
         if (user["loss_pack_tick"] == 0) user["current_channel_id"] = "0";
     }
 }
@@ -235,4 +236,4 @@ int main() {
     }
 }
 // xJ_2013320115
-// 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
+// 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
