@@ -179,7 +179,7 @@ int main() {
 
             if (contain(txt, "骂")) {
                 int ind = txt.find("骂");
-                cout << "[骂]";
+                cout << "[fuck]";
                 if (ind + 3 < txt.size()) {
                     string name = txt.substr(ind + 3);
                     string words = get_dirty_talk();
