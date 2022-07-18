@@ -179,9 +179,13 @@ int main() {
 
             if (contain(txt, "骂")) {
                 int ind = txt.find("骂");
+                cout << "[骂]";
                 if (ind + 2 < txt.size()) {
                     string name = txt.substr(ind + 2);
-                    send_message_to_onebot(name + "~ " + get_dirty_talk());
+                    string words = get_dirty_talk();
+                    if (contain(name, "我")) name = "你";
+                    cout << name << "~ " << words << endl;
+                    send_message_to_onebot(name + "~ " + words);
                 }
             }
 
@@ -220,11 +224,12 @@ int main() {
     init_user_info();
 
     while (1) {
-        cout << endl;
         update_users_status();
         sleep(1);
         curtime++;
         cout << "-";
+        cout.flush();
     }
 }
 // xJ_2013320115
+// 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
